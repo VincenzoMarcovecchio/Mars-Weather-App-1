@@ -1,4 +1,4 @@
-const API_KEY = 'DEMO_KEY'
+const API_KEY = 'lu9sT97c1NlwxywwfgHgQbqaxIXhfw6lMoT0B6nY'
 const API_URL = `https://api.nasa.gov/insight_weather/?api_key=${API_KEY}&feedtype=json&ver=1.0`
 
 const currentSolElement = document.querySelector('[data-current-sol]')
@@ -20,47 +20,6 @@ const unitToggle = document.querySelector('[data-unit-toggle]')
 let selectedSolIndex
 let metricUnits = unitToggle.getAttribute('aria-checked') !== 'true'
 
-previousWeatherToggle.addEventListener('change', () => {
-  previousWeatherContainer.classList.toggle('show-weather')
-})
-
-getWeather().then(sols => {
-  selectedSolIndex = sols.length - 1
-  displayPreviousSols(sols)
-  displaySelectedSol(sols)
-
-  unitToggle.addEventListener('click', () => {
-    metricUnits = !metricUnits
-    const label = metricUnits ? "celsius" : "fahrenheit"
-    unitToggle.setAttribute('aria-checked', !metricUnits)
-    unitToggle.setAttribute('aria-label', label)
-    displaySols(sols)
-    updateUnits()
-  })
-})
-
-function getWeather() {
-  return fetch(API_URL)
-    .then(res => res.json())
-    .then(resData => {
-      const {
-        sol_keys,
-        validity_checks,
-        ...solData
-       } = resData
-      return Object.entries(solData).map(([sol, data]) => {
-        return {
-          sol: sol,
-          maxTemp: data.AT.mx,
-          minTemp: data.AT.mn,
-          windSpeed: data.HWS.av,
-          windDirectionDegrees: data.WD.most_common.compass_degrees,
-          windDirectionCardinal: data.WD.most_common.compass_point,
-          date: new Date(data.First_UTC)
-        }
-      })
-    })
-}
 
 function displaySols(sols) {
   displaySelectedSol(sols)
@@ -125,3 +84,48 @@ function updateUnits() {
   speedUnits.forEach(unit => unit.innerText = metricUnits ? 'kph' : 'mph')
   tempUnits.forEach(unit => unit.innerText = metricUnits ? 'C' : 'F')
 }
+
+
+function getWeather() {
+  return fetch(API_URL)
+    .then(res => res.json())
+    .then(resData => {
+      const {
+        sol_keys,
+        validity_checks,
+        ...solData
+       } = resData
+      return Object.entries(solData).map(([sol, data]) => {
+        return {
+          sol: sol,
+          maxTemp: data.AT.mx,
+          minTemp: data.AT.mn,
+          windSpeed: data.HWS.av,
+          windDirectionDegrees: data.WD.most_common.compass_degrees,
+          windDirectionCardinal: data.WD.most_common.compass_point,
+          date: new Date(data.First_UTC)
+        }
+      })
+    })
+}
+
+
+previousWeatherToggle.addEventListener('change', () => {
+  previousWeatherContainer.classList.toggle('show-weather')
+})
+
+getWeather().then(sols => {
+  selectedSolIndex = sols.length - 1
+  displayPreviousSols(sols)
+  displaySelectedSol(sols)
+
+  unitToggle.addEventListener('click', () => {
+    metricUnits = !metricUnits
+    const label = metricUnits ? "celsius" : "fahrenheit"
+    unitToggle.setAttribute('aria-checked', !metricUnits)
+    unitToggle.setAttribute('aria-label', label)
+    displaySols(sols)
+    updateUnits()
+  })
+})
+
